@@ -2,7 +2,7 @@ name: DevOps CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, Test, test ]
   pull_request:
     branches: [ main ]
 

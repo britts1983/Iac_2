@@ -1,0 +1,43 @@
+name: DevOps CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+
+    - name: Terraform Format
+      run: terraform fmt -check -recursive
+      working-directory: terraform/
+
+    - name: Terraform Validate
+      run: |
+        terraform init -backend=false
+        terraform validate
+      working-directory: terraform/
+
+    - name: Install Ansible
+      run: sudo apt install -y ansible
+
+    - name: Ansible Syntax Check
+      run: ansible-playbook ansible/playbook.yml --syntax-check -i ansible/inventory.ini
+
+    - name: Install Kubectl & Lint K8s
+      run: |
+        sudo apt install -y kubectl yamllint
+        yamllint k8s/
+        kubectl apply --dry-run=client --validate=false -f k8s/deployment.yaml
+        kubectl apply --dry-run=client --validate=false -f k8s/service.yaml

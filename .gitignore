@@ -1,0 +1,9 @@
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.retry
+*.log
+*.pem
+*.key
+.vscode/
+.idea/
